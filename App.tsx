@@ -5,7 +5,7 @@ import VersionSelectionScreen from './screens/VersionSelectionScreen';
 import MainApp from './screens/MainApp';
 import MainAppSencillo from './screens/MainAppSencillo';
 import { useSupabase } from './context/SupabaseContext';
-import { Member, WeeklyRecord, Formulas, MonthlyReport, ChurchInfo } from './types';
+import { Member, WeeklyRecord, Formulas, MonthlyReport, ChurchInfo, Comisionado } from './types';
 import { INITIAL_MEMBERS, INITIAL_CATEGORIES, DEFAULT_FORMULAS, DEFAULT_CHURCH_INFO } from './constants';
 
 // A custom hook to manage state in localStorage
@@ -41,6 +41,7 @@ const App: React.FC = () => {
     // --- State Management ---
     const [members, setMembers] = useState<Member[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
+    const [comisionados, setComisionados] = useState<Comisionado[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState("Cargando datos desde la nube...");
 
@@ -105,38 +106,60 @@ const App: React.FC = () => {
             const loadInitialData = async () => {
                 setIsLoading(true);
                 try {
-                    let fetchedMembers = await fetchItems('members');
-                    let fetchedCategories = await fetchItems('categories');
+                    const [fetchedMembersRaw, fetchedCategories, fetchedComisionados] = await Promise.all([
+                        fetchItems('members'),
+                        fetchItems('categories'),
+                        fetchItems('comisionados', 'nombre'),
+                    ]);
 
-                    // If database is empty, seed with initial data from constants
-                    if (fetchedMembers.length === 0) {
+                    // --- Members ---
+                    let mappedMembers: Member[];
+                    if (fetchedMembersRaw.length === 0) {
                         setLoadingMessage("Configurando su base de datos por primera vez (Miembros)...");
-                        for (const member of INITIAL_MEMBERS) {
-                           await addItem('members', { name: member.name });
-                        }
-                        fetchedMembers = await fetchItems('members'); // Refetch after seeding
+                        const seededMembersRaw = await Promise.all(
+                            INITIAL_MEMBERS.map(member => addItem('members', { name: member.name, is_active: true }))
+                        );
+                        mappedMembers = seededMembersRaw.map((m: any) => ({
+                            id: m.id,
+                            name: m.name,
+                            isActive: m.is_active,
+                        }));
+                    } else {
+                        mappedMembers = fetchedMembersRaw.map((m: any) => ({
+                            id: m.id,
+                            name: m.name,
+                            isActive: m.is_active === false ? false : true,
+                        }));
                     }
-                    setMembers(fetchedMembers);
+                    setMembers(mappedMembers);
                     
+                    // --- Categories ---
                     if (fetchedCategories.length === 0) {
                         setLoadingMessage("Configurando su base de datos por primera vez (Categorías)...");
-                        for (const categoryName of INITIAL_CATEGORIES) {
-                           await addItem('categories', { name: categoryName });
-                        }
-                         const refetchedCategories = await fetchItems('categories');
-                         fetchedCategories = refetchedCategories;
+                        await Promise.all(
+                            INITIAL_CATEGORIES.map(categoryName => addItem('categories', { name: categoryName }))
+                        );
+                        const refetchedCategories = await fetchItems('categories');
+                        setCategories(refetchedCategories.map((c: any) => c.name));
+                    } else {
+                        setCategories(fetchedCategories.map((c: any) => c.name));
                     }
-                    setCategories(fetchedCategories.map((c: any) => c.name));
+
+                    // --- Comisionados ---
+                    setComisionados(fetchedComisionados.map((c: any) => ({
+                        id: c.id,
+                        nombre: c.nombre,
+                        cargo: c.cargo
+                    })));
                     
                 } catch (error) {
-                    // FIX: Improved error logging to show a clear message instead of "[object Object]".
                     const errorMessage = error instanceof Error ? error.message : String(error);
                     console.error("Failed to fetch initial data from Supabase:", errorMessage);
                     
-                    // Fallback to constants if fetch fails
                     console.warn("Falling back to initial constant data due to Supabase fetch error.");
-                    setMembers(INITIAL_MEMBERS);
+                    setMembers(INITIAL_MEMBERS.map(m => ({ ...m, isActive: true })));
                     setCategories(INITIAL_CATEGORIES);
+                    setComisionados([]);
 
                 } finally {
                     setIsLoading(false);
@@ -212,8 +235,8 @@ const App: React.FC = () => {
         return <VersionSelectionScreen onSelect={handleSelectVersion} />;
     }
     
-    const appData = { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo };
-    const appHandlers = { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo };
+    const appData = { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo, comisionados };
+    const appHandlers = { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados };
 
     if (appVersion === 'completo') {
         return <MainApp 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tab, WeeklyRecord, Member, Formulas, MonthlyReport, ChurchInfo } from '../types';
+import { Tab, WeeklyRecord, Member, Formulas, MonthlyReport, ChurchInfo, Comisionado } from '../types';
 import Header from '../components/layout/Header';
 // import BottomNav from '../components/layout/BottomNav'; // No longer used
 import RegistroOfrendasTab from '../components/tabs/RegistroOfrendasTab';
@@ -22,6 +22,7 @@ interface AppData {
     formulas: Formulas;
     monthlyReports: MonthlyReport[];
     churchInfo: ChurchInfo;
+    comisionados: Comisionado[];
 }
 
 interface AppHandlers {
@@ -32,6 +33,7 @@ interface AppHandlers {
     setFormulas: React.Dispatch<React.SetStateAction<Formulas>>;
     setMonthlyReports: React.Dispatch<React.SetStateAction<MonthlyReport[]>>;
     setChurchInfo: React.Dispatch<React.SetStateAction<ChurchInfo>>;
+    setComisionados: React.Dispatch<React.SetStateAction<Comisionado[]>>;
 }
 
 interface MainAppProps {
@@ -58,8 +60,8 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
   const { uploadFile, supabase } = useSupabase();
   
   // Destructure props for easier use
-  const { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo } = data;
-  const { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo } = handlers;
+  const { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo, comisionados } = data;
+  const { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados } = handlers;
 
   const uploadRecordToSupabase = async (record: WeeklyRecord) => {
     if (!supabase) {
@@ -180,7 +182,8 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
         );
       case 'summary':
         // FIX: Corrected component props to match definition.
-        return <ResumenFinancieroTab currentRecord={currentRecord} categories={categories} />;
+        // FIX: Added missing weeklyRecords prop.
+        return <ResumenFinancieroTab currentRecord={currentRecord} weeklyRecords={weeklyRecords} categories={categories} />;
       case 'history':
         return <SemanasRegistradasTab 
                     records={weeklyRecords} 
@@ -199,6 +202,8 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
                     savedReports={monthlyReports}
                     setSavedReports={setMonthlyReports}
                     churchInfo={churchInfo}
+                    comisionados={comisionados}
+                    members={members}
                 />;
       case 'admin':
         return (
@@ -211,6 +216,8 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
             setFormulas={setFormulas}
             churchInfo={churchInfo}
             setChurchInfo={setChurchInfo}
+            comisionados={comisionados}
+            setComisionados={setComisionados}
           />
         );
       default:

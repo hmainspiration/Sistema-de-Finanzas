@@ -1,28 +1,29 @@
 import { Member, Formulas, MonthlyReportFormState, ChurchInfo } from './types';
 
-export const APP_VERSION = '1.1.2';
+export const APP_VERSION = '1.8.2';
 
 // Lista de miembros actualizada según la solicitud del usuario.
 export const INITIAL_MEMBERS: Member[] = [
-  { id: 'm-1', name: 'Elmer Ocampo' },
-  { id: 'm-2', name: 'Rubén Ocampo' },
-  { id: 'm-3', name: 'Santos Pichardo' },
-  { id: 'm-4', name: 'Adilia Martínez' },
-  { id: 'm-5', name: 'Salía Ocampo' },
-  { id: 'm-6', name: 'Janny Morales' },
-  { id: 'm-7', name: 'Hilda Morales Ocampo' },
-  { id: 'm-8', name: 'Reina Matamoros' },
-  { id: 'm-9', name: 'Anny Blanchard Ocampo' },
-  { id: 'm-10', name: 'Marta García' },
-  { id: 'm-11', name: 'Victorina Matamoros' },
-  { id: 'm-12', name: 'María Campo' },
-  { id: 'm-13', name: 'Neli Ocampo (Apartada)' },
-  { id: 'm-14', name: 'Damaris Ortiz (Esposa de ministro)' },
-  { id: 'm-15', name: 'Katerin Blanchard Ocampo (Apartada)' },
-  { id: 'm-16', name: 'Miurel Blanchard Ocampo (Apartada)' },
-  { id: 'm-17', name: 'Fernando Pichardo Ocampo' },
-  { id: 'm-18', name: 'Nain Alvarez' },
-  { id: 'm-19', name: 'Libni Alvarez' },
+  // FIX: Added isActive property to each member object to match the Member type.
+  { id: 'm-1', name: 'Elmer Ocampo', isActive: true },
+  { id: 'm-2', name: 'Rubén Ocampo', isActive: true },
+  { id: 'm-3', name: 'Santos Pichardo', isActive: true },
+  { id: 'm-4', name: 'Adilia Martínez', isActive: true },
+  { id: 'm-5', name: 'Salía Ocampo', isActive: true },
+  { id: 'm-6', name: 'Janny Morales', isActive: true },
+  { id: 'm-7', name: 'Hilda Morales Ocampo', isActive: true },
+  { id: 'm-8', name: 'Reina Matamoros', isActive: true },
+  { id: 'm-9', name: 'Anny Blanchard Ocampo', isActive: true },
+  { id: 'm-10', name: 'Marta García', isActive: true },
+  { id: 'm-11', name: 'Victorina Matamoros', isActive: true },
+  { id: 'm-12', name: 'María Campo', isActive: true },
+  { id: 'm-13', name: 'Neli Ocampo (Apartada)', isActive: false },
+  { id: 'm-14', name: 'Damaris Ortiz (Esposa de ministro)', isActive: true },
+  { id: 'm-15', name: 'Katerin Blanchard Ocampo (Apartada)', isActive: false },
+  { id: 'm-16', name: 'Miurel Blanchard Ocampo (Apartada)', isActive: false },
+  { id: 'm-17', name: 'Fernando Pichardo Ocampo', isActive: true },
+  { id: 'm-18', name: 'Nain Alvarez', isActive: true },
+  { id: 'm-19', name: 'Libni Alvarez', isActive: true },
 ];
 
 export const INITIAL_CATEGORIES: string[] = [
@@ -36,7 +37,7 @@ export const INITIAL_CATEGORIES: string[] = [
 
 export const DEFAULT_FORMULAS: Formulas = {
   diezmoPercentage: 10,
-  remanenteThreshold: 4500, // Ajustado de 5000 a 4500
+  remanenteThreshold: 4500, // Ajustado a 4500
 };
 
 export const DEFAULT_CHURCH_INFO: ChurchInfo = {

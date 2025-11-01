@@ -17,7 +17,7 @@ interface SupabaseContextType {
     listFiles: (bucket: string) => Promise<any[] | null>;
     getPublicUrl: (bucket: string, path: string) => string;
     // Database table functions
-    fetchItems: (tableName: string) => Promise<any[]>;
+    fetchItems: (tableName: string, orderBy?: string) => Promise<any[]>;
     addItem: (tableName: string, item: object) => Promise<any>;
     updateItem: (tableName: string, id: string, updates: object) => Promise<any>;
     deleteItem: (tableName: string, id: string) => Promise<any>;
@@ -85,9 +85,9 @@ export const SupabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     // --- Database Table Methods ---
 
-    const fetchItems = useCallback(async (tableName: string) => {
+    const fetchItems = useCallback(async (tableName: string, orderBy = 'name') => {
         if (!supabase) throw new Error("Supabase client not initialized.");
-        const { data, error: fetchError } = await supabase.from(tableName).select('*').order('name', { ascending: true });
+        const { data, error: fetchError } = await supabase.from(tableName).select('*').order(orderBy, { ascending: true });
         if (fetchError) {
             setError(fetchError.message);
             throw fetchError;
