@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tab, WeeklyRecord, Member, Formulas, MonthlyReport, ChurchInfo, Comisionado } from '../types';
 import Header from '../components/layout/Header';
 // import BottomNav from '../components/layout/BottomNav'; // No longer used
@@ -34,6 +34,7 @@ interface AppHandlers {
     setMonthlyReports: React.Dispatch<React.SetStateAction<MonthlyReport[]>>;
     setChurchInfo: React.Dispatch<React.SetStateAction<ChurchInfo>>;
     setComisionados: React.Dispatch<React.SetStateAction<Comisionado[]>>;
+    setTheme: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
 }
 
 interface MainAppProps {
@@ -43,9 +44,10 @@ interface MainAppProps {
   handlers: AppHandlers;
   theme: string;
   toggleTheme: () => void;
+  appVersion: 'completo' | 'sencillo';
 }
 
-const navItems = [
+const allNavItems = [
   { id: 'register', label: 'Registro', icon: CirclePlus },
   { id: 'summary', label: 'Resumen', icon: BarChart2 },
   { id: 'history', label: 'Semanas', icon: CalendarDays },
@@ -54,14 +56,29 @@ const navItems = [
   { id: 'admin', label: 'Admin', icon: Settings },
 ];
 
-const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, handlers, theme, toggleTheme }) => {
+const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, handlers, theme, toggleTheme, appVersion }) => {
   const [activeTab, setActiveTab] = useState<Tab>('register');
   const [isSaving, setIsSaving] = useState(false);
   const { uploadFile, supabase } = useSupabase();
   
   // Destructure props for easier use
   const { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo, comisionados } = data;
-  const { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados } = handlers;
+  const { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados, setTheme } = handlers;
+
+  const navItems = useMemo(() => {
+    if (appVersion === 'sencillo') {
+        const simpleTabs = ['register', 'summary', 'history'];
+        return allNavItems.filter(item => simpleTabs.includes(item.id));
+    }
+    return allNavItems;
+  }, [appVersion]);
+
+  // Reset active tab if it's no longer visible (e.g., after switching from complete to simple version)
+  useEffect(() => {
+      if (!navItems.find(item => item.id === activeTab)) {
+          setActiveTab('register');
+      }
+  }, [navItems, activeTab]);
 
   const uploadRecordToSupabase = async (record: WeeklyRecord) => {
     if (!supabase) {
@@ -218,6 +235,12 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
             setChurchInfo={setChurchInfo}
             comisionados={comisionados}
             setComisionados={setComisionados}
+            weeklyRecords={weeklyRecords}
+            setWeeklyRecords={setWeeklyRecords}
+            monthlyReports={monthlyReports}
+            setMonthlyReports={setMonthlyReports}
+            theme={theme}
+            setTheme={setTheme}
           />
         );
       default:
@@ -237,15 +260,15 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
         activeTab={activeTab}
         setActiveTab={setActiveTab as (tab: string) => void}
       />
-      <main className="flex-grow p-4 pb-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+      <main className="flex-grow p-4 pb-4 overflow-y-auto bg-background">
         <div className="max-w-4xl mx-auto">
          {renderContent()}
         </div>
       </main>
        {isSaving && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-lg flex items-center gap-4 dark:bg-gray-800">
-                    <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="bg-card text-card-foreground p-6 rounded-lg flex items-center gap-4 border">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                     <span className="text-lg font-semibold">Guardando y Subiendo...</span>
                 </div>
             </div>

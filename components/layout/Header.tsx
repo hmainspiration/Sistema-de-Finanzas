@@ -31,14 +31,14 @@ const Header: React.FC<HeaderProps> = ({
     setActiveTab
 }) => {
     return (
-        <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-20">
+        <header className="bg-card shadow-md sticky top-0 z-20 border-b">
             <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-                <h1 className="text-xl font-bold text-indigo-900 dark:text-white">Sistema de Finanzas</h1>
+                <h1 className="text-xl font-bold text-foreground">Sistema de Finanzas</h1>
                 <div className="flex items-center gap-2">
                     {showSwitchVersion && (
                         <button
                             onClick={onSwitchVersion}
-                            className="flex items-center gap-2 p-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                            className="flex items-center gap-2 p-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
                             aria-label="Cambiar versión"
                             title="Cambiar versión"
                         >
@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({
                     )}
                     <button
                         onClick={toggleTheme}
-                        className="flex items-center gap-2 p-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                        className="flex items-center gap-2 p-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
                         aria-label="Cambiar tema"
                         title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
                     >
@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({
                     </button>
                     <button
                         onClick={onLogout}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
                         aria-label="Cerrar sesión"
                     >
                         <LogOut className="w-5 h-5" />
@@ -63,19 +63,19 @@ const Header: React.FC<HeaderProps> = ({
                     </button>
                 </div>
             </div>
-            <nav className="border-t border-gray-200 dark:border-gray-700">
+            <nav className="border-t border-border">
                 <div className="flex justify-around max-w-4xl mx-auto">
                     {navItems.map((item) => (
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`flex flex-col items-center justify-center w-full pt-2 pb-1 text-xs transition-colors duration-200 ${
-                            activeTab === item.id ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400'
+                            activeTab === item.id ? 'text-primary font-bold' : 'text-muted-foreground hover:text-primary'
                             }`}
                         >
                             <item.icon className="w-6 h-6 mb-1" />
                             <span>{item.label}</span>
-                             {activeTab === item.id && <div className="w-full h-1 mt-1 rounded-full bg-blue-600 dark:bg-blue-400"></div>}
+                             {activeTab === item.id && <div className="w-full h-1 mt-1 rounded-full bg-primary"></div>}
                         </button>
                     ))}
                 </div>

@@ -50,57 +50,57 @@ const ResumenMensualTab: React.FC<ResumenMensualTabProps> = ({ records, categori
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-300">Resumen Mensual</h2>
-      <div className="p-6 bg-white rounded-xl shadow-lg dark:bg-gray-800">
+      <h2 className="text-2xl font-bold text-foreground">Resumen Mensual</h2>
+      <div className="p-6 bg-card rounded-xl shadow-lg border">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="reportMonth" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mes</label>
-            <select id="reportMonth" value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600">
+            <label htmlFor="reportMonth" className="block text-sm font-medium text-muted-foreground">Mes</label>
+            <select id="reportMonth" value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))} className="mt-1 block w-full p-2 border-input bg-input rounded-md shadow-sm">
               {MONTH_NAMES.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="reportYear" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Año</label>
-            <input type="number" id="reportYear" value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600" />
+            <label htmlFor="reportYear" className="block text-sm font-medium text-muted-foreground">Año</label>
+            <input type="number" id="reportYear" value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} className="mt-1 block w-full p-2 border-input bg-input rounded-md shadow-sm" />
           </div>
         </div>
       </div>
       
       {monthlyData ? (
-        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 dark:bg-gray-800">
-            <h3 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Resultados para {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
-            <div className="p-4 space-y-2 bg-blue-50 rounded-lg dark:bg-blue-900/30">
-              <h4 className="font-bold text-blue-800 dark:text-blue-300">Ingresos Totales por Categoría</h4>
+        <div className="p-6 bg-card rounded-xl shadow-lg space-y-4 border">
+            <h3 className="text-xl font-bold text-foreground">Resultados para {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
+            <div className="p-4 space-y-2 bg-secondary rounded-lg">
+              <h4 className="font-bold text-secondary-foreground">Ingresos Totales por Categoría</h4>
               {categories.map(cat => (
                 <div key={cat} className="flex justify-between">
-                  <span className="dark:text-gray-300">{cat}:</span>
-                  <span className="font-semibold dark:text-gray-100">C$ {monthlyData.subtotals[cat]?.toFixed(2) || '0.00'}</span>
+                  <span className="text-secondary-foreground">{cat}:</span>
+                  <span className="font-semibold text-secondary-foreground">C$ {monthlyData.subtotals[cat]?.toFixed(2) || '0.00'}</span>
                 </div>
               ))}
             </div>
-             <div className="p-4 space-y-2 bg-green-50 rounded-lg dark:bg-green-900/30">
-              <h4 className="font-bold text-green-800 dark:text-green-300">Cálculos Totales del Mes</h4>
-               <div className="flex justify-between font-bold text-lg border-b pb-2 dark:border-gray-600">
-                  <span>TOTAL (Diezmo + Ordinaria):</span>
-                  <span>C$ {monthlyData.total.toFixed(2)}</span>
+             <div className="p-4 space-y-2 bg-green-500/10 rounded-lg">
+              <h4 className="font-bold text-green-700 dark:text-green-300">Cálculos Totales del Mes</h4>
+               <div className="flex justify-between font-bold text-lg border-b pb-2 border-border">
+                  <span className="text-foreground">TOTAL (Diezmo + Ordinaria):</span>
+                  <span className="text-foreground">C$ {monthlyData.total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="dark:text-gray-300">Total Diezmo de Diezmo:</span>
-                  <span className="font-semibold dark:text-gray-100">C$ {monthlyData.totalDiezmoDeDiezmo.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Total Diezmo de Diezmo:</span>
+                  <span className="font-semibold text-foreground">C$ {monthlyData.totalDiezmoDeDiezmo.toFixed(2)}</span>
                 </div>
                  <div className="flex justify-between">
-                  <span className="dark:text-gray-300">Total Remanente:</span>
-                  <span className="font-semibold dark:text-gray-100">C$ {monthlyData.totalRemanente.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Total Remanente:</span>
+                  <span className="font-semibold text-foreground">C$ {monthlyData.totalRemanente.toFixed(2)}</span>
                 </div>
                  <div className="flex justify-between">
-                  <span className="dark:text-gray-300">Total Gomer del Ministro:</span>
-                  <span className="font-semibold dark:text-gray-100">C$ {monthlyData.gomerMinistro.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Total Gomer del Ministro:</span>
+                  <span className="font-semibold text-foreground">C$ {monthlyData.gomerMinistro.toFixed(2)}</span>
                 </div>
             </div>
         </div>
       ) : (
-        <div className="p-6 text-center bg-white rounded-xl shadow-lg dark:bg-gray-800">
-            <p className="dark:text-gray-300">No hay datos para {MONTH_NAMES[selectedMonth - 1]} de {selectedYear}.</p>
+        <div className="p-6 text-center bg-card rounded-xl shadow-lg border">
+            <p className="text-muted-foreground">No hay datos para {MONTH_NAMES[selectedMonth - 1]} de {selectedYear}.</p>
         </div>
       )}
     </div>

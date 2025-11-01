@@ -19,21 +19,21 @@ const Accordion: FC<{ title: string, children: ReactNode, initialOpen?: boolean 
     const [isOpen, setIsOpen] = useState(initialOpen);
 
     return (
-        <div className="bg-white rounded-xl shadow-md dark:bg-gray-800">
+        <div className="bg-card rounded-xl shadow-md border">
             <button
                 type="button"
-                className="w-full p-5 text-left font-semibold text-lg flex justify-between items-center text-gray-800 dark:text-gray-100"
+                className="w-full p-5 text-left font-semibold text-lg flex justify-between items-center text-card-foreground"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
             >
                 <span>{title}</span>
-                <svg className={`w-5 h-5 transform transition-transform text-gray-500 dark:text-gray-400 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                <svg className={`w-5 h-5 transform transition-transform text-muted-foreground ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
             <div
                 className="overflow-hidden transition-all duration-300 ease-out"
                 style={{ maxHeight: isOpen ? '2000px' : '0' }}
             >
-                <div className="px-5 pb-5 pt-4 border-t dark:border-gray-700">
+                <div className="px-5 pb-5 pt-4 border-t">
                     {children}
                 </div>
             </div>
@@ -43,13 +43,13 @@ const Accordion: FC<{ title: string, children: ReactNode, initialOpen?: boolean 
 
 const CurrencyInput: FC<{ id: string, placeholder: string, value: string, onChange: (e: ChangeEvent<HTMLInputElement>) => void }> = memo(({ id, placeholder, value, onChange }) => (
     <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none dark:text-gray-400">C$</span>
-        <input type="number" step="0.01" id={id} name={id} placeholder={placeholder} value={value} onChange={onChange} className="w-full p-2 border rounded-lg pl-10 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" />
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">C$</span>
+        <input type="number" step="0.01" id={id} name={id} placeholder={placeholder} value={value} onChange={onChange} className="w-full p-2 border rounded-lg pl-10 bg-input text-foreground" />
     </div>
 ));
 
 // Helper components for building the form moved outside the main component to prevent re-creation on render
-const Subheading: FC<{ title: string }> = ({ title }) => <h4 className="md:col-span-2 font-semibold text-gray-800 mb-2 mt-4 border-b pb-1 dark:text-gray-200 dark:border-gray-600">{title}</h4>;
+const Subheading: FC<{ title: string }> = ({ title }) => <h4 className="md:col-span-2 font-semibold text-foreground mb-2 mt-4 border-b pb-1">{title}</h4>;
 
 const Field: FC<{
     id: keyof MonthlyReportFormState;
@@ -59,11 +59,11 @@ const Field: FC<{
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }> = memo(({ id, label, isCurrency = true, value, onChange }) => (
     <div>
-        <label htmlFor={id} className="block text-sm font-medium text-gray-600 mb-1 dark:text-gray-300">{label}</label>
+        <label htmlFor={id} className="block text-sm font-medium text-muted-foreground mb-1">{label}</label>
         {isCurrency ? (
             <CurrencyInput id={id} placeholder="0.00" value={value} onChange={onChange} />
         ) : (
-            <input type="text" id={id} name={id} value={value} onChange={onChange} placeholder={label} className="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" />
+            <input type="text" id={id} name={id} value={value} onChange={onChange} placeholder={label} className="w-full p-2 border rounded-lg bg-input text-foreground" />
         )}
     </div>
 ));
@@ -130,21 +130,21 @@ const UploadedMonthlyReportsList: React.FC = () => {
     }, [supabase, listFiles]);
 
     if (loading) {
-        return <p className="text-center text-gray-500 py-2 dark:text-gray-400">Cargando reportes de la nube...</p>;
+        return <p className="text-center text-muted-foreground py-2">Cargando reportes de la nube...</p>;
     }
 
     if (error) {
-        return <div className="p-3 text-center text-red-600 bg-red-50 rounded-lg dark:bg-red-900/30 dark:text-red-300">{error}</div>;
+        return <div className="p-3 text-center text-destructive bg-destructive/10 rounded-lg">{error}</div>;
     }
 
     return (
         <div className="space-y-3 max-h-60 overflow-y-auto p-1">
             {files.length > 0 ? (
                 files.map(file => (
-                    <div key={file.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg border dark:bg-gray-700 dark:border-gray-600">
+                    <div key={file.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-secondary rounded-lg border">
                         <div>
-                            <p className="font-semibold text-sm text-gray-800 dark:text-gray-200">{file.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Subido: {new Date(file.created_at).toLocaleString()}</p>
+                            <p className="font-semibold text-sm text-secondary-foreground">{file.name}</p>
+                            <p className="text-xs text-muted-foreground">Subido: {new Date(file.created_at).toLocaleString()}</p>
                         </div>
                         <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                             <a
@@ -160,7 +160,7 @@ const UploadedMonthlyReportsList: React.FC = () => {
                     </div>
                 ))
             ) : (
-                <p className="text-center text-gray-500 py-2 dark:text-gray-400">No hay informes mensuales en la nube.</p>
+                <p className="text-center text-muted-foreground py-2">No hay informes mensuales en la nube.</p>
             )}
         </div>
     );
@@ -272,9 +272,10 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
         startY += 35;
 
         const bodyStyle = { fontSize: 7, cellPadding: 0.8, lineColor: '#000', lineWidth: 0.1 };
-        const headStyle = { fontSize: 7.5, fontStyle: 'bold', fillColor: '#08818C', textColor: '#FFFFFF', halign: 'center', lineColor: '#000', lineWidth: 0.1 };
+        // Updated colors to match theme
+        const headStyle = { fontSize: 7.5, fontStyle: 'bold', fillColor: '#2563eb', textColor: '#FFFFFF', halign: 'center', lineColor: '#000', lineWidth: 0.1 };
         const rightAlign = { halign: 'right' };
-        const subheadStyle = { fontStyle: 'bold', fillColor: '#DCEAF7' };
+        const subheadStyle = { fontStyle: 'bold', fillColor: '#f1f5f9' };
         
         doc.autoTable({
             startY: startY,
@@ -528,9 +529,9 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
 
     return (
         <div className="space-y-6">
-            <header className="text-center p-6 bg-white rounded-xl shadow-md dark:bg-gray-800">
-                <h1 className="text-2xl md:text-3xl font-bold text-blue-800 dark:text-blue-400">MINISTERIO DE ADMINISTRACIÓN FINANCIERA</h1>
-                <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300">Información Financiera Mensual - Jurisdicción Nicaragua, C.A.</p>
+            <header className="text-center p-6 bg-card rounded-xl shadow-md border">
+                <h1 className="text-2xl md:text-3xl font-bold text-primary">MINISTERIO DE ADMINISTRACIÓN FINANCIERA</h1>
+                <p className="text-lg md:text-xl text-muted-foreground">Información Financiera Mensual - Jurisdicción Nicaragua, C.A.</p>
             </header>
             
             {supabase && (
@@ -543,21 +544,21 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
                 <div className="space-y-3 max-h-60 overflow-y-auto p-1">
                     {sortedReports.length > 0 ? (
                         sortedReports.map(report => (
-                            <div key={report.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg border dark:bg-gray-700 dark:border-gray-600">
+                            <div key={report.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-secondary rounded-lg border">
                                 <div>
-                                    <p className="font-semibold text-blue-700 dark:text-blue-400">{MONTH_NAMES[report.month - 1]} {report.year}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">ID: {report.id}</p>
+                                    <p className="font-semibold text-primary">{MONTH_NAMES[report.month - 1]} {report.year}</p>
+                                    <p className="text-xs text-muted-foreground">ID: {report.id}</p>
                                 </div>
                                 <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                                     <button onClick={() => handleLoadReport(report)} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors">
                                         <Upload className="w-4 h-4" />
                                         Cargar
                                     </button>
-                                     <button onClick={() => handleExportSavedReport(report)} disabled={isGenerating} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors disabled:bg-gray-400">
+                                     <button onClick={() => handleExportSavedReport(report)} disabled={isGenerating} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors disabled:bg-opacity-50">
                                         <FileDown className="w-4 h-4" />
                                         Exportar
                                     </button>
-                                    <button onClick={() => handleDeleteReport(report.id)} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-red-500 rounded-md hover:bg-red-600 transition-colors">
+                                    <button onClick={() => handleDeleteReport(report.id)} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-destructive-foreground bg-destructive rounded-md hover:bg-destructive/90 transition-colors">
                                         <Trash2 className="w-4 h-4" />
                                         Eliminar
                                     </button>
@@ -565,29 +566,29 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500 py-2 dark:text-gray-400">No hay informes guardados localmente.</p>
+                        <p className="text-center text-muted-foreground py-2">No hay informes guardados localmente.</p>
                     )}
                 </div>
             </Accordion>
 
-             <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 dark:bg-gray-800">
-                <h3 className="text-xl font-bold text-blue-700 dark:text-blue-400">Cargar Datos del Sistema</h3>
+             <div className="p-6 bg-card rounded-xl shadow-lg space-y-4 border">
+                <h3 className="text-xl font-bold text-primary">Cargar Datos del Sistema</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                     <div>
-                        <label htmlFor="reportMonth" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mes</label>
-                        <select id="reportMonth" value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <label htmlFor="reportMonth" className="block text-sm font-medium text-muted-foreground">Mes</label>
+                        <select id="reportMonth" value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))} className="mt-1 block w-full p-2 border-input bg-input rounded-md shadow-sm">
                             {MONTH_NAMES.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="reportYear" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Año</label>
-                        <input type="number" id="reportYear" value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600" />
+                        <label htmlFor="reportYear" className="block text-sm font-medium text-muted-foreground">Año</label>
+                        <input type="number" id="reportYear" value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} className="mt-1 block w-full p-2 border-input bg-input rounded-md shadow-sm" />
                     </div>
                     <button onClick={handleLoadData} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
                         Cargar Datos del Mes
                     </button>
                 </div>
-                 <p className="text-xs text-gray-500 mt-2 dark:text-gray-400">Nota: Esto llenará automáticamente los campos del informe con los datos de las semanas registradas para el mes seleccionado. Los campos como "Primicias" o "Colectas Especiales" deben llenarse manualmente.</p>
+                 <p className="text-xs text-muted-foreground mt-2">Nota: Esto llenará automáticamente los campos del informe con los datos de las semanas registradas para el mes seleccionado. Los campos como "Primicias" o "Colectas Especiales" deben llenarse manualmente.</p>
             </div>
 
             <form id="financial-form" className="space-y-4">
@@ -675,11 +676,11 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
                     </div>
                 </Accordion>
             </form>
-            <div className="p-6 bg-white rounded-xl shadow-lg flex flex-col sm:flex-row gap-4 items-center dark:bg-gray-800">
+            <div className="p-6 bg-card rounded-xl shadow-lg flex flex-col sm:flex-row gap-4 items-center border">
                 <button
                     onClick={handlePreview}
                     disabled={isGeneratingPreview}
-                    className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400"
+                    className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors disabled:bg-opacity-50"
                 >
                     {isGeneratingPreview ? (
                         <>
@@ -696,11 +697,11 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
                 <button
                     onClick={handleGenerateCurrentReport}
                     disabled={isGenerating}
-                    className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+                    className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors disabled:bg-opacity-50"
                 >
                     {isGenerating ? (
                         <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                             <span>Generando...</span>
                         </>
                     ) : (
@@ -714,7 +715,7 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
                     <Save className="w-5 h-5" />
                     Guardar Formulario
                 </button>
-                <button onClick={handleClearForm} className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
+                <button onClick={handleClearForm} className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-destructive text-destructive-foreground font-bold rounded-lg hover:bg-destructive/90 transition-colors">
                     <Trash2 className="w-5 h-5" />
                     Limpiar Formulario
                 </button>

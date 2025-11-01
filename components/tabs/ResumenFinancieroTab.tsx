@@ -9,10 +9,10 @@ interface ResumenFinancieroTabProps {
   categories: string[];
 }
 
-const StatCard: FC<{label: string, value: string, color?: string}> = ({ label, value, color = 'bg-gray-100 dark:bg-gray-700' }) => (
-    <div className={`p-4 rounded-xl shadow-md ${color}`}>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{label}</p>
-        <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+const StatCard: FC<{label: string, value: string, color?: string}> = ({ label, value, color = 'bg-card' }) => (
+    <div className={`p-4 rounded-xl shadow-md ${color} border`}>
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
     </div>
 );
 
@@ -55,17 +55,17 @@ const ResumenFinancieroTab: FC<ResumenFinancieroTabProps> = ({ currentRecord, we
 
   if (!recordToShow || !calculations) {
     return (
-      <div className="p-6 text-center bg-white rounded-xl shadow-lg dark:bg-gray-800">
-        <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-300 mb-4">Resumen Financiero</h2>
+      <div className="p-6 text-center bg-card rounded-xl shadow-lg border">
+        <h2 className="text-2xl font-bold text-foreground mb-4">Resumen Financiero</h2>
         {currentRecord ? (
-          <p className="dark:text-gray-300">No hay datos para mostrar.</p>
+          <p className="text-muted-foreground">No hay datos para mostrar.</p>
         ) : (
           <div>
-            <p className="mb-4 dark:text-gray-300">No hay una semana activa. Seleccione una semana guardada para ver su resumen.</p>
+            <p className="mb-4 text-muted-foreground">No hay una semana activa. Seleccione una semana guardada para ver su resumen.</p>
             <select
               onChange={(e) => setSelectedRecordId(e.target.value)}
               defaultValue=""
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+              className="mt-1 block w-full p-2 border-input bg-input rounded-md shadow-sm"
             >
               <option value="" disabled>-- Seleccione una semana --</option>
               {sortedRecords.map(record => (
@@ -82,26 +82,26 @@ const ResumenFinancieroTab: FC<ResumenFinancieroTabProps> = ({ currentRecord, we
 
   return (
     <div className="space-y-6">
-      <div className="p-6 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-        <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-300">Resumen Financiero Semanal</h2>
-        <p className="text-gray-500 dark:text-gray-400">Semana del {recordToShow.day}/{recordToShow.month}/{recordToShow.year}</p>
+      <div className="p-6 bg-card rounded-xl shadow-lg border">
+        <h2 className="text-2xl font-bold text-foreground">Resumen Financiero Semanal</h2>
+        <p className="text-muted-foreground">Semana del {recordToShow.day}/{recordToShow.month}/{recordToShow.year}</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StatCard label="TOTAL (Diezmo + Ordinaria)" value={`C$ ${calculations.total.toFixed(2)}`} color="bg-blue-100 dark:bg-blue-900/50"/>
-        <StatCard label="Gomer del Ministro" value={`C$ ${calculations.gomerMinistro.toFixed(2)}`} color="bg-green-100 dark:bg-green-900/50"/>
-        <StatCard label="Diezmo de Diezmo" value={`C$ ${calculations.diezmoDeDiezmo.toFixed(2)}`} color="bg-indigo-100 dark:bg-indigo-900/50"/>
-        <StatCard label="Remanente" value={`C$ ${calculations.remanente.toFixed(2)}`} color="bg-purple-100 dark:bg-purple-900/50"/>
+        <StatCard label="TOTAL (Diezmo + Ordinaria)" value={`C$ ${calculations.total.toFixed(2)}`} color="bg-card"/>
+        <StatCard label="Gomer del Ministro" value={`C$ ${calculations.gomerMinistro.toFixed(2)}`} color="bg-card"/>
+        <StatCard label="Diezmo de Diezmo" value={`C$ ${calculations.diezmoDeDiezmo.toFixed(2)}`} color="bg-card"/>
+        <StatCard label="Remanente" value={`C$ ${calculations.remanente.toFixed(2)}`} color="bg-card"/>
       </div>
 
-      <div className="p-6 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-          <h3 className="text-xl font-bold text-indigo-900 dark:text-indigo-300 mb-4">Desglose por Categoría</h3>
+      <div className="p-6 bg-card rounded-xl shadow-lg border">
+          <h3 className="text-xl font-bold text-foreground mb-4">Desglose por Categoría</h3>
           <div className="space-y-2">
               {categories.map(cat => (
                   calculations.subtotals[cat] > 0 &&
-                  <div key={cat} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg dark:bg-gray-700/50">
-                      <span className="font-medium text-gray-700 dark:text-gray-200">{cat}</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">C$ {calculations.subtotals[cat].toFixed(2)}</span>
+                  <div key={cat} className="flex justify-between items-center p-3 bg-secondary rounded-lg">
+                      <span className="font-medium text-secondary-foreground">{cat}</span>
+                      <span className="font-semibold text-secondary-foreground">C$ {calculations.subtotals[cat].toFixed(2)}</span>
                   </div>
               ))}
           </div>

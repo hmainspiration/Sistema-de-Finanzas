@@ -39,15 +39,15 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({ members, onSelect }) =>
         value={inputValue}
         onChange={handleChange}
         placeholder="Escriba el nombre del miembro..."
-        className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent text-gray-900 placeholder-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:placeholder-gray-400"
+        className="w-full p-3 bg-input border-border rounded-lg shadow-sm focus:ring-2 focus:ring-ring focus:border-transparent text-foreground placeholder:text-muted-foreground"
       />
       {suggestions.length > 0 && (
-        <ul className="absolute z-20 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 dark:bg-gray-800 dark:border-gray-600">
+        <ul className="absolute z-20 w-full mt-1 overflow-y-auto bg-popover border rounded-lg shadow-lg max-h-60 text-popover-foreground">
           {suggestions.map(member => (
             <li
               key={member.id}
               onClick={() => handleSelect(member)}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900 dark:text-gray-200 dark:hover:bg-gray-700"
+              className="px-4 py-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
             >
               {member.name}
             </li>
@@ -156,32 +156,32 @@ const UploadedReportsList: FC<{
 
 
     if (loading) {
-        return <div className="p-4 text-center text-gray-500 dark:text-gray-400">Cargando reportes de la nube...</div>;
+        return <div className="p-4 text-center text-muted-foreground">Cargando reportes de la nube...</div>;
     }
 
     if (error) {
-        return <div className="p-4 text-center text-red-600 bg-red-50 rounded-lg dark:bg-red-900/30 dark:text-red-300">{error}</div>;
+        return <div className="p-4 text-center text-destructive bg-destructive/10 rounded-lg">{error}</div>;
     }
     
     return (
-        <div className="p-6 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-            <h2 className="text-2xl font-bold text-indigo-900 mb-4 dark:text-indigo-300">Reportes Semanales en la Nube</h2>
+        <div className="p-6 bg-card text-card-foreground rounded-xl shadow-lg border">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Reportes Semanales en la Nube</h2>
             {files.length > 0 ? (
                 <ul className="space-y-3 max-h-72 overflow-y-auto">
                     {files.map(file => (
-                        <li key={file.id} className="flex flex-col sm:flex-row justify-between sm:items-center p-3 bg-gray-50 rounded-md border dark:bg-gray-700/50 dark:border-gray-600">
+                        <li key={file.id} className="flex flex-col sm:flex-row justify-between sm:items-center p-3 bg-secondary rounded-md border">
                            <div>
-                                <p className="font-medium text-gray-800 dark:text-gray-200">{file.name}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Subido: {new Date(file.created_at).toLocaleString()}</p>
+                                <p className="font-medium text-secondary-foreground">{file.name}</p>
+                                <p className="text-xs text-muted-foreground">Subido: {new Date(file.created_at).toLocaleString()}</p>
                            </div>
                            <div className="flex items-center gap-2 mt-2 sm:mt-0">
                                 <button
                                     onClick={() => handleLoadToApp(file)}
                                     disabled={isLoadingToApp === file.id}
-                                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 disabled:bg-opacity-50"
                                 >
                                     {isLoadingToApp === file.id
-                                        ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        ? <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                                         : <Download className="w-4 h-4"/>
                                     }
                                     <span>{isLoadingToApp === file.id ? 'Cargando...' : 'Cargar en App'}</span>
@@ -200,7 +200,7 @@ const UploadedReportsList: FC<{
                     ))}
                 </ul>
             ) : (
-                <p className="text-center text-gray-500 py-4 dark:text-gray-400">No hay reportes semanales en la nube.</p>
+                <p className="text-center text-muted-foreground py-4">No hay reportes semanales en la nube.</p>
             )}
         </div>
     );
@@ -349,83 +349,83 @@ const SemanasRegistradasTab: FC<SemanasRegistradasTabProps> = ({ records, setRec
     <div className="space-y-6">
       <UploadedReportsList records={records} setRecords={setRecords} formulas={formulas} churchInfo={churchInfo} />
 
-      <div className="p-6 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-        <h2 className="text-2xl font-bold text-indigo-900 mb-4 dark:text-indigo-300">Semanas Guardadas (Local)</h2>
+      <div className="p-6 bg-card text-card-foreground rounded-xl shadow-lg border">
+        <h2 className="text-2xl font-bold text-foreground mb-4">Semanas Guardadas (Local)</h2>
         {sortedRecords.length > 0 ? (
           <ul className="space-y-3 max-h-96 overflow-y-auto">
             {sortedRecords.map(record => (
-              <li key={record.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg border dark:bg-gray-700/50 dark:border-gray-600">
+              <li key={record.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-secondary rounded-lg border">
                 <div>
-                  <p className="font-bold text-lg text-indigo-900 dark:text-indigo-300">{`Semana del ${record.day} de ${MONTH_NAMES[record.month - 1]}, ${record.year}`}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{`${record.offerings.length} ofrendas registradas`}</p>
+                  <p className="font-bold text-lg text-primary">{`Semana del ${record.day} de ${MONTH_NAMES[record.month - 1]}, ${record.year}`}</p>
+                  <p className="text-sm text-muted-foreground">{`${record.offerings.length} ofrendas registradas`}</p>
                 </div>
                 <div className="flex items-center gap-2 mt-3 sm:mt-0">
-                  <button onClick={() => handleReupload(record.id)} disabled={isUploading === record.id} title="Volver a subir a la nube" className="p-2 text-white bg-blue-600 rounded-full hover:bg-blue-700 disabled:bg-gray-400">
-                    {isUploading === record.id ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <CloudUpload className="w-5 h-5" />}
+                  <button onClick={() => handleReupload(record.id)} disabled={isUploading === record.id} title="Volver a subir a la nube" className="p-2 text-primary-foreground bg-primary rounded-full hover:bg-primary/90 disabled:bg-opacity-50">
+                    {isUploading === record.id ? <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div> : <CloudUpload className="w-5 h-5" />}
                   </button>
                   <button onClick={() => handleOpenEditModal(record)} title="Editar" className="p-2 text-white bg-yellow-500 rounded-full hover:bg-yellow-600"><Pencil className="w-5 h-5" /></button>
-                  <button onClick={() => handleDelete(record.id)} title="Eliminar" className="p-2 text-white bg-red-500 rounded-full hover:bg-red-600"><Trash2 className="w-5 h-5" /></button>
+                  <button onClick={() => handleDelete(record.id)} title="Eliminar" className="p-2 text-destructive-foreground bg-destructive rounded-full hover:bg-destructive/90"><Trash2 className="w-5 h-5" /></button>
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-center text-gray-500 py-8 dark:text-gray-400">No hay semanas guardadas localmente.</p>
+          <p className="text-center text-muted-foreground py-8">No hay semanas guardadas localmente.</p>
         )}
       </div>
 
       {editingRecord && tempRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-30 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col dark:bg-gray-800">
-            <header className="flex justify-between items-center p-4 border-b dark:border-gray-700 flex-shrink-0">
-              <h3 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Editar Semana</h3>
-              <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"><X className="w-6 h-6"/></button>
+          <div className="bg-card text-card-foreground rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border">
+            <header className="flex justify-between items-center p-4 border-b flex-shrink-0">
+              <h3 className="text-xl font-bold text-foreground">Editar Semana</h3>
+              <button onClick={handleCloseModal} className="text-muted-foreground hover:text-foreground"><X className="w-6 h-6"/></button>
             </header>
             
             <main className="p-6 overflow-y-auto space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha</label>
-                    <input type="text" value={`${tempRecord.day}/${tempRecord.month}/${tempRecord.year}`} readOnly className="mt-1 w-full p-2 bg-gray-100 text-gray-700 dark:text-gray-300 dark:bg-gray-700 border rounded-md" />
+                    <label className="block text-sm font-medium text-muted-foreground">Fecha</label>
+                    <input type="text" value={`${tempRecord.day}/${tempRecord.month}/${tempRecord.year}`} readOnly className="mt-1 w-full p-2 bg-input text-foreground border rounded-md" />
                   </div>
                   <div>
-                    <label htmlFor="minister" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Ministro</label>
-                    <input type="text" id="minister" name="minister" value={tempRecord.minister} onChange={handleModalInputChange} className="mt-1 w-full p-2 border border-gray-300 rounded-md text-gray-900 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200" />
+                    <label htmlFor="minister" className="block text-sm font-medium text-muted-foreground">Ministro</label>
+                    <input type="text" id="minister" name="minister" value={tempRecord.minister} onChange={handleModalInputChange} className="mt-1 w-full p-2 border-input bg-input rounded-md text-foreground" />
                   </div>
               </div>
-              <div className="p-4 border rounded-lg dark:border-gray-700">
-                <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">Añadir Ofrenda</h4>
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-semibold mb-2 text-foreground">Añadir Ofrenda</h4>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <AutocompleteInput members={members} onSelect={setSelectedMember} />
-                    <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Cantidad C$" className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200 dark:placeholder-gray-400"/>
-                    <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Cantidad C$" className="w-full p-3 border-input bg-input rounded-lg text-foreground placeholder:text-muted-foreground"/>
+                    <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-3 border-input bg-input rounded-lg text-foreground">
                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
-                    <button onClick={handleAddOfferingInModal} className="flex items-center justify-center gap-2 w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                    <button onClick={handleAddOfferingInModal} className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90">
                        <Plus className="w-5 h-5"/> Añadir
                     </button>
                 </div>
-                 {selectedMember && <p className="text-xs mt-2 text-blue-600 dark:text-blue-400">Seleccionado: {selectedMember.name}</p>}
+                 {selectedMember && <p className="text-xs mt-2 text-primary">Seleccionado: {selectedMember.name}</p>}
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">Ofrendas ({tempRecord.offerings.length})</h4>
-                <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-2 dark:border-gray-700">
+                <h4 className="font-semibold mb-2 text-foreground">Ofrendas ({tempRecord.offerings.length})</h4>
+                <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-2">
                     {tempRecord.offerings.length > 0 ? [...tempRecord.offerings].reverse().map(offering => (
-                        <div key={offering.id} className="flex justify-between items-center p-2 bg-gray-50 rounded-md dark:bg-gray-700/50">
+                        <div key={offering.id} className="flex justify-between items-center p-2 bg-secondary rounded-md">
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">{offering.memberName}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{offering.category} - C$ {offering.amount.toFixed(2)}</p>
+                                <p className="font-medium text-secondary-foreground">{offering.memberName}</p>
+                                <p className="text-sm text-muted-foreground">{offering.category} - C$ {offering.amount.toFixed(2)}</p>
                             </div>
-                            <button onClick={() => handleRemoveOfferingInModal(offering.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => handleRemoveOfferingInModal(offering.id)} className="text-destructive hover:text-destructive/80 p-1"><Trash2 className="w-4 h-4" /></button>
                         </div>
-                    )) : <p className="text-center text-gray-500 py-4 dark:text-gray-400">No hay ofrendas.</p>}
+                    )) : <p className="text-center text-muted-foreground py-4">No hay ofrendas.</p>}
                 </div>
               </div>
             </main>
 
-            <footer className="flex justify-end gap-4 p-4 border-t dark:border-gray-700 flex-shrink-0">
-              <button onClick={handleCloseModal} className="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg hover:bg-gray-300 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">Cancelar</button>
+            <footer className="flex justify-end gap-4 p-4 border-t flex-shrink-0">
+              <button onClick={handleCloseModal} className="px-4 py-2 text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80">Cancelar</button>
               <button onClick={handleSaveChanges} className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">Guardar Cambios</button>
             </footer>
           </div>

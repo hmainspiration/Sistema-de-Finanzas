@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Member, Formulas, ChurchInfo, Comisionado } from '../../types';
+import React, { useState, useRef } from 'react';
+import { Member, Formulas, ChurchInfo, Comisionado, WeeklyRecord, MonthlyReport } from '../../types';
 import { useSupabase } from '../../context/SupabaseContext';
 import { UserPlus, Pencil, Trash2, Check, X, Server, Wifi, AlertTriangle, Save } from 'lucide-react';
-
+import { APP_VERSION, DEFAULT_FORMULAS, DEFAULT_CHURCH_INFO } from '../../constants';
 
 const SupabaseStatusIndicator: React.FC = () => {
     const { supabase, error } = useSupabase();
@@ -11,7 +11,7 @@ const SupabaseStatusIndicator: React.FC = () => {
         const isCorsError = error.toLowerCase().includes('failed to fetch');
 
         return (
-            <div className="p-4 text-sm text-left text-red-800 bg-red-100 border border-red-200 rounded-lg dark:bg-red-900/30 dark:text-red-300 dark:border-red-500/50" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+            <div className="p-4 text-sm text-left text-destructive-foreground bg-destructive/20 border border-destructive/30 rounded-lg" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                   <div>
@@ -22,12 +22,12 @@ const SupabaseStatusIndicator: React.FC = () => {
                             <p>CORS es un mecanismo de seguridad del navegador que impide que una página web solicite recursos de un dominio diferente. Para solucionarlo, debe autorizar explícitamente el dominio de esta aplicación en la configuración de su proyecto de Supabase.</p>
                             <p className="font-semibold mt-3">Siga estos pasos para solucionarlo:</p>
                             <ol className="list-decimal list-inside space-y-1 pl-2">
-                                <li>Vaya a su panel de control de Supabase en <a href="https://supabase.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline dark:text-blue-400">supabase.com</a>.</li>
+                                <li>Vaya a su panel de control de Supabase en <a href="https://supabase.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">supabase.com</a>.</li>
                                 <li>Seleccione su proyecto.</li>
                                 <li>En el menú de la izquierda, haga clic en el ícono de <strong>Configuración del Proyecto</strong> (engranaje).</li>
                                 <li>Seleccione <strong>API</strong> en la lista de configuraciones.</li>
                                 <li>Busque la sección <strong>Configuración de CORS</strong> (Cross-Origin Resource Sharing).</li>
-                                <li>En el campo de texto, agregue una nueva línea con <strong className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">*</strong> (un asterisco).</li>
+                                <li>En el campo de texto, agregue una nueva línea con <strong className="font-mono bg-muted px-1 rounded">*</strong> (un asterisco).</li>
                                 <li>Haga clic en <strong>Guardar</strong>.</li>
                             </ol>
                             <p className="mt-3 text-xs"><strong>Nota de Seguridad:</strong> Usar <code className="font-mono">*</code> permite el acceso desde cualquier dominio. Para producción, es más seguro reemplazar el asterisco con la URL específica donde se alojará su aplicación.</p>
@@ -43,23 +43,22 @@ const SupabaseStatusIndicator: React.FC = () => {
 
     if (supabase) {
         return (
-            <div className="flex items-center gap-4 p-3 bg-green-100 border border-green-200 rounded-lg dark:bg-green-900/30 dark:border-green-500/50">
-                <Wifi className="w-5 h-5 text-green-800 dark:text-green-300"/>
-                <p className="text-sm text-green-800 dark:text-green-300">Conectado a Supabase exitosamente.</p>
+            <div className="flex items-center gap-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <Wifi className="w-5 h-5 text-green-500"/>
+                <p className="text-sm text-green-700 dark:text-green-300">Conectado a Supabase exitosamente.</p>
             </div>
         );
     }
 
     return (
-        <div className="flex items-center gap-4 p-3 bg-yellow-100 border border-yellow-200 rounded-lg dark:bg-yellow-900/30 dark:border-yellow-500/50">
-             <Server className="w-5 h-5 text-yellow-800 dark:text-yellow-300"/>
-             <p className="text-sm text-yellow-800 dark:text-yellow-300">Inicializando conexión con Supabase...</p>
+        <div className="flex items-center gap-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+             <Server className="w-5 h-5 text-yellow-500"/>
+             <p className="text-sm text-yellow-700 dark:text-yellow-300">Inicializando conexión con Supabase...</p>
         </div>
     );
 };
 
-
-const AdminPanelTab: React.FC<{
+interface AdminPanelTabProps {
     members: Member[];
     setMembers: React.Dispatch<React.SetStateAction<Member[]>>;
     categories: string[];
@@ -70,8 +69,17 @@ const AdminPanelTab: React.FC<{
     setChurchInfo: React.Dispatch<React.SetStateAction<ChurchInfo>>;
     comisionados: Comisionado[];
     setComisionados: React.Dispatch<React.SetStateAction<Comisionado[]>>;
-}> = ({
-    members, setMembers, categories, setCategories, formulas, setFormulas, churchInfo, setChurchInfo, comisionados, setComisionados
+    weeklyRecords: WeeklyRecord[];
+    setWeeklyRecords: React.Dispatch<React.SetStateAction<WeeklyRecord[]>>;
+    monthlyReports: MonthlyReport[];
+    setMonthlyReports: React.Dispatch<React.SetStateAction<MonthlyReport[]>>;
+    theme: string;
+    setTheme: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
+}
+
+const AdminPanelTab: React.FC<AdminPanelTabProps> = ({
+    members, setMembers, categories, setCategories, formulas, setFormulas, churchInfo, setChurchInfo, comisionados, setComisionados,
+    weeklyRecords, setWeeklyRecords, monthlyReports, setMonthlyReports, theme, setTheme
 }) => {
     const { addItem, updateItem, deleteItem } = useSupabase();
     const [newMemberName, setNewMemberName] = useState('');
@@ -81,6 +89,7 @@ const AdminPanelTab: React.FC<{
     const [editingMember, setEditingMember] = useState<Member | null>(null);
     const [newComisionado, setNewComisionado] = useState({ nombre: '', cargo: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const importFileRef = useRef<HTMLInputElement>(null);
     
     // Helper function to map Supabase's snake_case to the app's camelCase
     const mapSupabaseMemberToAppMember = (supabaseMember: any): Member => {
@@ -231,37 +240,140 @@ const AdminPanelTab: React.FC<{
         }
     };
 
+    const handleExportData = () => {
+        try {
+            const dataToExport = {
+                version: APP_VERSION,
+                exportDate: new Date().toISOString(),
+                data: {
+                    weeklyRecords,
+                    monthlyReports,
+                    formulas,
+                    churchInfo,
+                    theme,
+                    // Cloud-synced data is included for reference but won't be auto-imported to Supabase
+                    members,
+                    categories,
+                    comisionados
+                }
+            };
+
+            const jsonString = JSON.stringify(dataToExport, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const href = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = href;
+            const date = new Date().toISOString().split('T')[0];
+            link.download = `sistema_finanzas_backup_${date}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(href);
+
+            alert("Copia de seguridad local exportada exitosamente.");
+        } catch (error) {
+            console.error("Failed to export data:", error);
+            alert(`Error al exportar los datos: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    };
+    
+    const handleTriggerImport = () => {
+        importFileRef.current?.click();
+    };
+
+    const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const text = e.target?.result;
+                if (typeof text !== 'string') {
+                    throw new Error("El archivo no se pudo leer.");
+                }
+                const importedData = JSON.parse(text);
+
+                // Basic validation
+                if (!importedData.data || !importedData.data.weeklyRecords) {
+                    throw new Error("El archivo de copia de seguridad no tiene el formato correcto.");
+                }
+
+                if (!window.confirm("¿Está seguro de que desea importar estos datos? Se sobrescribirán todos los datos locales actuales (registros semanales, informes, configuraciones). Esta acción no se puede deshacer.")) {
+                    return;
+                }
+                
+                // Restore localStorage data
+                setWeeklyRecords(importedData.data.weeklyRecords || []);
+                setMonthlyReports(importedData.data.monthlyReports || []);
+                setFormulas(importedData.data.formulas || DEFAULT_FORMULAS);
+                setChurchInfo(importedData.data.churchInfo || DEFAULT_CHURCH_INFO);
+                setTheme(importedData.data.theme || 'light');
+
+                alert("Importación completada. Los registros semanales, informes y configuraciones han sido restaurados. Los datos de miembros y categorías se actualizarán desde la nube al recargar la página.");
+
+            } catch (error) {
+                 console.error("Failed to import data:", error);
+                 alert(`Error al importar los datos: ${error instanceof Error ? error.message : String(error)}`);
+            } finally {
+                // Reset input value to allow re-importing the same file
+                if (importFileRef.current) {
+                    importFileRef.current.value = "";
+                }
+            }
+        };
+        reader.readAsText(file);
+    };
+
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-300">Panel de Administración</h2>
+            <h2 className="text-2xl font-bold text-foreground">Panel de Administración</h2>
             <SupabaseStatusIndicator />
+            
+            <div className="p-4 bg-card rounded-xl shadow-lg border">
+                <h3 className="text-xl font-bold text-foreground mb-4">Copia de Seguridad y Restauración</h3>
+                <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                        Guarde todos los datos locales (semanas, informes, configuraciones) en un archivo. Esto es crucial si necesita limpiar la caché de su navegador o mover datos a otro dispositivo.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <button onClick={handleExportData} className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90">
+                            Exportar Datos Locales
+                        </button>
+                        <button onClick={handleTriggerImport} className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">
+                            Importar Datos Locales
+                        </button>
+                        <input type="file" ref={importFileRef} onChange={handleImportData} accept="application/json" className="hidden" />
+                    </div>
+                </div>
+            </div>
 
-            <div className="p-4 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-                <h3 className="text-xl font-bold text-indigo-900 mb-4 dark:text-indigo-300">Gestión de Miembros</h3>
+            <div className="p-4 bg-card rounded-xl shadow-lg border">
+                <h3 className="text-xl font-bold text-foreground mb-4">Gestión de Miembros</h3>
                 <div className="flex gap-2 mb-4">
-                    <input type="text" value={newMemberName} onChange={(e) => setNewMemberName(e.target.value)} placeholder="Nombre completo" className="flex-grow p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"/>
-                    <button onClick={handleAddMember} disabled={isSubmitting} className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
+                    <input type="text" value={newMemberName} onChange={(e) => setNewMemberName(e.target.value)} placeholder="Nombre completo" className="flex-grow p-2 border-input bg-input rounded-md text-foreground"/>
+                    <button onClick={handleAddMember} disabled={isSubmitting} className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:bg-opacity-50">
                         <UserPlus className="w-5 h-5"/> Añadir
                     </button>
                 </div>
                 <ul className="space-y-2 max-h-72 overflow-y-auto">
                     {members.map(member => (
-                        <li key={member.id} className={`flex items-center justify-between p-2 rounded-md ${member.isActive ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-gray-200 dark:bg-gray-600'}`}>
+                        <li key={member.id} className={`flex items-center justify-between p-2 rounded-md ${member.isActive ? 'bg-secondary' : 'bg-muted'}`}>
                            {editingMember?.id === member.id ? (
                                 <div className="flex-grow flex gap-2 items-center">
-                                    <input type="text" value={editingMember.name} onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })} className="flex-grow p-1 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" autoFocus />
+                                    <input type="text" value={editingMember.name} onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })} className="flex-grow p-1 border-input bg-input rounded" autoFocus />
                                     <button onClick={handleSaveEdit} disabled={isSubmitting} className="p-2 text-green-500 hover:text-green-700"><Check className="w-4 h-4" /></button>
-                                    <button onClick={() => setEditingMember(null)} className="p-2 text-red-500 hover:text-red-700"><X className="w-4 h-4" /></button>
+                                    <button onClick={() => setEditingMember(null)} className="p-2 text-destructive hover:text-destructive/80"><X className="w-4 h-4" /></button>
                                 </div>
                             ) : (
                                 <>
-                                    <span className={`${!member.isActive && 'line-through'}`}>{member.name}</span>
+                                    <span className={`${!member.isActive && 'line-through text-muted-foreground'}`}>{member.name}</span>
                                     <div className="flex items-center gap-2">
-                                        <button onClick={() => handleToggleMemberActive(member.id, !member.isActive)} title={member.isActive ? "Marcar como inactivo" : "Marcar como activo"} className={`px-2 py-1 text-xs rounded-full ${member.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}>
+                                        <button onClick={() => handleToggleMemberActive(member.id, !member.isActive)} title={member.isActive ? "Marcar como inactivo" : "Marcar como activo"} className={`px-2 py-1 text-xs rounded-full ${member.isActive ? 'bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-red-500/20 text-red-700 dark:text-red-300'}`}>
                                             {member.isActive ? "Activo" : "Inactivo"}
                                         </button>
-                                        <button onClick={() => handleStartEdit(member)} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"><Pencil className="w-4 h-4" /></button>
-                                        <button onClick={() => handleDeleteMember(member.id)} className="p-2 text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
+                                        <button onClick={() => handleStartEdit(member)} className="p-2 text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+                                        <button onClick={() => handleDeleteMember(member.id)} className="p-2 text-destructive hover:text-destructive/80"><Trash2 className="w-4 h-4" /></button>
                                     </div>
                                 </>
                             )}
@@ -270,83 +382,83 @@ const AdminPanelTab: React.FC<{
                 </ul>
             </div>
             
-            <div className="p-4 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-                <h3 className="text-xl font-bold text-indigo-900 mb-4 dark:text-indigo-300">Gestión de Categorías</h3>
+            <div className="p-4 bg-card rounded-xl shadow-lg border">
+                <h3 className="text-xl font-bold text-foreground mb-4">Gestión de Categorías</h3>
                  <div className="flex gap-2 mb-4">
-                    <input type="text" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Nombre de categoría" className="flex-grow p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
-                    <button onClick={handleAddCategory} disabled={isSubmitting} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400">Añadir</button>
+                    <input type="text" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Nombre de categoría" className="flex-grow p-2 border-input bg-input rounded-md text-foreground" />
+                    <button onClick={handleAddCategory} disabled={isSubmitting} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:bg-opacity-50">Añadir</button>
                 </div>
                  <ul className="flex flex-wrap gap-2">
                     {categories.map(cat => (
-                        <li key={cat} className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full text-sm dark:bg-gray-700">
+                        <li key={cat} className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-sm text-secondary-foreground">
                             <span>{cat}</span>
-                            <button onClick={() => handleDeleteCategory(cat)} className="text-red-500 hover:text-red-700"><X className="w-4 h-4"/></button>
+                            <button onClick={() => handleDeleteCategory(cat)} className="text-destructive hover:text-destructive/80"><X className="w-4 h-4"/></button>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            <div className="p-4 bg-white rounded-xl shadow-lg dark:bg-gray-800">
+            <div className="p-4 bg-card rounded-xl shadow-lg border">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Fórmulas de Cálculo</h3>
+                    <h3 className="text-xl font-bold text-foreground">Fórmulas de Cálculo</h3>
                     <button onClick={handleSaveFormulas} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"><Save className="w-5 h-5"/> Guardar</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Porcentaje Diezmo (%)</label>
-                        <input type="number" name="diezmoPercentage" value={tempFormulas.diezmoPercentage} onChange={handleFormulaChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                        <label className="block text-sm font-medium text-muted-foreground">Porcentaje Diezmo (%)</label>
+                        <input type="number" name="diezmoPercentage" value={tempFormulas.diezmoPercentage} onChange={handleFormulaChange} className="mt-1 w-full p-2 border-input bg-input rounded-md" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Umbral Remanente (C$)</label>
-                        <input type="number" name="remanenteThreshold" value={tempFormulas.remanenteThreshold} onChange={handleFormulaChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                        <label className="block text-sm font-medium text-muted-foreground">Umbral Remanente (C$)</label>
+                        <input type="number" name="remanenteThreshold" value={tempFormulas.remanenteThreshold} onChange={handleFormulaChange} className="mt-1 w-full p-2 border-input bg-input rounded-md" />
                     </div>
                 </div>
             </div>
 
-            <div className="p-4 bg-white rounded-xl shadow-lg dark:bg-gray-800">
+            <div className="p-4 bg-card rounded-xl shadow-lg border">
                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Información de Iglesia</h3>
+                    <h3 className="text-xl font-bold text-foreground">Información de Iglesia</h3>
                     <button onClick={handleSaveChurchInfo} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"><Save className="w-5 h-5"/> Guardar</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Ministro por Defecto</label>
-                        <input type="text" name="defaultMinister" value={tempChurchInfo.defaultMinister} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"/>
+                        <label className="block text-sm font-medium text-muted-foreground">Ministro por Defecto</label>
+                        <input type="text" name="defaultMinister" value={tempChurchInfo.defaultMinister} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border-input bg-input rounded-md"/>
                     </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Grado del Ministro</label>
-                        <input type="text" name="ministerGrade" value={tempChurchInfo.ministerGrade} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"/>
+                        <label className="block text-sm font-medium text-muted-foreground">Grado del Ministro</label>
+                        <input type="text" name="ministerGrade" value={tempChurchInfo.ministerGrade} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border-input bg-input rounded-md"/>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Distrito</label>
-                        <input type="text" name="district" value={tempChurchInfo.district} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"/>
+                        <label className="block text-sm font-medium text-muted-foreground">Distrito</label>
+                        <input type="text" name="district" value={tempChurchInfo.district} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border-input bg-input rounded-md"/>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Departamento</label>
-                        <input type="text" name="department" value={tempChurchInfo.department} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"/>
+                        <label className="block text-sm font-medium text-muted-foreground">Departamento</label>
+                        <input type="text" name="department" value={tempChurchInfo.department} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border-input bg-input rounded-md"/>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono Ministro</label>
-                        <input type="text" name="ministerPhone" value={tempChurchInfo.ministerPhone} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"/>
+                        <label className="block text-sm font-medium text-muted-foreground">Teléfono Ministro</label>
+                        <input type="text" name="ministerPhone" value={tempChurchInfo.ministerPhone} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border-input bg-input rounded-md"/>
                     </div>
                 </div>
             </div>
 
-             <div className="p-4 bg-white rounded-xl shadow-lg dark:bg-gray-800">
-                <h3 className="text-xl font-bold text-indigo-900 mb-4 dark:text-indigo-300">Comisión de Finanzas</h3>
+             <div className="p-4 bg-card rounded-xl shadow-lg border">
+                <h3 className="text-xl font-bold text-foreground mb-4">Comisión de Finanzas</h3>
                 <div className="flex flex-col md:flex-row gap-2 mb-4">
-                    <input type="text" value={newComisionado.nombre} onChange={(e) => setNewComisionado({...newComisionado, nombre: e.target.value})} placeholder="Nombre completo" className="flex-grow p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
-                    <input type="text" value={newComisionado.cargo} onChange={(e) => setNewComisionado({...newComisionado, cargo: e.target.value})} placeholder="Cargo" className="flex-grow p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
-                    <button onClick={handleAddComisionado} disabled={isSubmitting} className="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400">Añadir</button>
+                    <input type="text" value={newComisionado.nombre} onChange={(e) => setNewComisionado({...newComisionado, nombre: e.target.value})} placeholder="Nombre completo" className="flex-grow p-2 border-input bg-input rounded-md" />
+                    <input type="text" value={newComisionado.cargo} onChange={(e) => setNewComisionado({...newComisionado, cargo: e.target.value})} placeholder="Cargo" className="flex-grow p-2 border-input bg-input rounded-md" />
+                    <button onClick={handleAddComisionado} disabled={isSubmitting} className="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:bg-opacity-50">Añadir</button>
                 </div>
                 <ul className="space-y-2">
                     {comisionados.map(com => (
-                        <li key={com.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-md dark:bg-gray-700/50">
+                        <li key={com.id} className="flex items-center justify-between p-2 bg-secondary rounded-md">
                             <div>
-                                <p className="font-semibold">{com.nombre}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{com.cargo}</p>
+                                <p className="font-semibold text-secondary-foreground">{com.nombre}</p>
+                                <p className="text-sm text-muted-foreground">{com.cargo}</p>
                             </div>
-                            <button onClick={() => handleDeleteComisionado(com.id)} className="p-2 text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => handleDeleteComisionado(com.id)} className="p-2 text-destructive hover:text-destructive/80"><Trash2 className="w-4 h-4" /></button>
                         </li>
                     ))}
                 </ul>

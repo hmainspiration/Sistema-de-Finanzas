@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import LoginScreen from './components/LoginScreen';
 import VersionSelectionScreen from './screens/VersionSelectionScreen';
 import MainApp from './screens/MainApp';
-import MainAppSencillo from './screens/MainAppSencillo';
 import { useSupabase } from './context/SupabaseContext';
 import { Member, WeeklyRecord, Formulas, MonthlyReport, ChurchInfo, Comisionado } from './types';
 import { INITIAL_MEMBERS, INITIAL_CATEGORIES, DEFAULT_FORMULAS, DEFAULT_CHURCH_INFO } from './constants';
@@ -209,8 +208,8 @@ const App: React.FC = () => {
     // --- Render Logic ---
     if (supabaseError) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-red-50 text-red-800 p-4">
-                <div className="max-w-md text-center">
+            <div className="flex items-center justify-center min-h-screen bg-background p-4 text-destructive-foreground">
+                <div className="max-w-md text-center p-6 bg-destructive/10 rounded-lg">
                     <h1 className="text-2xl font-bold mb-4">Error de Configuración</h1>
                     <p>{supabaseError}</p>
                 </div>
@@ -224,9 +223,9 @@ const App: React.FC = () => {
 
     if (isLoading) {
         return (
-             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-                <div className="w-16 h-16 border-8 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="mt-4 text-lg font-semibold text-gray-700 dark:text-gray-200">{loadingMessage}</p>
+             <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+                <div className="w-16 h-16 border-8 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <p className="mt-4 text-lg font-semibold text-foreground">{loadingMessage}</p>
             </div>
         )
     }
@@ -236,31 +235,17 @@ const App: React.FC = () => {
     }
     
     const appData = { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo, comisionados };
-    const appHandlers = { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados };
+    const appHandlers = { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados, setTheme };
 
-    if (appVersion === 'completo') {
-        return <MainApp 
-            onLogout={handleLogout} 
-            onSwitchVersion={handleSwitchVersion}
-            data={appData}
-            handlers={appHandlers}
-            theme={theme}
-            toggleTheme={toggleTheme}
-        />;
-    }
-
-    if (appVersion === 'sencillo') {
-        return <MainAppSencillo 
-            onLogout={handleLogout} 
-            onSwitchVersion={handleSwitchVersion}
-            data={appData}
-            handlers={appHandlers}
-            theme={theme}
-            toggleTheme={toggleTheme}
-        />;
-    }
-
-    return null; // Should not happen
+    return <MainApp 
+        onLogout={handleLogout} 
+        onSwitchVersion={handleSwitchVersion}
+        data={appData}
+        handlers={appHandlers}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        appVersion={appVersion}
+    />;
 };
 
 export default App;
