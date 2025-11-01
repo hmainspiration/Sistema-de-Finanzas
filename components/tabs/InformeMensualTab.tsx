@@ -250,11 +250,6 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
         const getText = (key: keyof MonthlyReportFormState) => formData[key] || '';
         const getValue = (key: keyof MonthlyReportFormState) => formatCurrency(getNumericValue(key));
         
-        const comisionNombres = comisionados.slice(0, 3).map(c => c.nombre);
-        const firma1 = comisionNombres[0] || 'Firma 1';
-        const firma2 = comisionNombres[1] || 'Firma 2';
-        const firma3 = comisionNombres[2] || 'Firma 3';
-
         doc.addImage(logoBase64, 'PNG', margin, startY, 25, 25);
 
         doc.setFont('helvetica', 'bold');
@@ -375,24 +370,99 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
         
         startY = Math.max(finalYIngresos, finalYEgresos) + 5;
         
+        const ministerSignature = churchInfo.ministerSignature;
+        let signatureBlockY = startY;
+
+        if (ministerSignature) {
+            try {
+                const img = new Image();
+                img.src = ministerSignature;
+                const imgWidth = 45; // mm
+                const imgHeight = (img.height * imgWidth) / img.width;
+                const signatureX = (pageW / 2) - (imgWidth / 2);
+                const signatureY = startY - (imgHeight / 2);
+                doc.addImage(ministerSignature, 'PNG', signatureX, signatureY, imgWidth, imgHeight);
+                signatureBlockY = signatureY + imgHeight;
+            } catch (e) {
+                console.error("No se pudo agregar la imagen de la firma al PDF:", e);
+            }
+        }
+
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
-        doc.text(`_________________________`, pageW / 2, startY, { align: 'center' });
-        startY += 4;
-        doc.text(`Firma Ministro: ${getText('nombre-ministro')}`, pageW / 2, startY, { align: 'center' });
+        doc.text(`_________________________`, pageW / 2, signatureBlockY, { align: 'center' });
+        signatureBlockY += 4;
+        const ministerNameToDisplay = getText('nombre-ministro').trim() || churchInfo.defaultMinister;
+        doc.text(ministerNameToDisplay, pageW / 2, signatureBlockY, { align: 'center' });
+        doc.setFontSize(7);
+        signatureBlockY += 3;
+        doc.text(`Ministro Encargado`, pageW / 2, signatureBlockY, { align: 'center' });
         
-        startY += 6;
+        startY = signatureBlockY + 10;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('Comisión Local de Finanzas:', pageW / 2, startY, { align: 'center' });
+        startY += 10;
 
-        doc.autoTable({
-            startY,
-            body: [
-                [{ content: 'Comisión Local de Finanzas:', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center' } }],
-                ['\n\n_________________________', '\n\n_________________________', '\n\n_________________________'],
-                [firma1, firma2, firma3],
-            ],
-            theme: 'plain', styles: { fontSize: 8, halign: 'center' }, tableWidth: pageW - margin*2, margin: { left: margin }
+        const comisionadosToSign = comisionados.slice(0, 3);
+        const signatureAreaWidth = (pageW - margin * 2) / 3;
+        const signatureWidth = 40;
+        const signatureMaxHeight = 20;
+
+        let maxSignatureHeight = 0;
+        comisionadosToSign.forEach((comisionado) => {
+            if (comisionado.signature) {
+                try {
+                    const img = new Image();
+                    img.src = comisionado.signature;
+                    let imgHeight = (img.height * signatureWidth) / img.width;
+                    if (imgHeight > signatureMaxHeight) {
+                        imgHeight = signatureMaxHeight;
+                    }
+                    if (imgHeight > maxSignatureHeight) {
+                        maxSignatureHeight = imgHeight;
+                    }
+                } catch (e) { /* ignore */ }
+            }
         });
-        
+
+        const lineY = startY + (maxSignatureHeight > 0 ? maxSignatureHeight : 10) + 2;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+
+        comisionadosToSign.forEach((comisionado, index) => {
+            const centerX = margin + (signatureAreaWidth * index) + (signatureAreaWidth / 2);
+            
+            if (comisionado.signature) {
+                try {
+                    const img = new Image();
+                    img.src = comisionado.signature;
+                    let imgWidth = signatureWidth;
+                    let imgHeight = (img.height * imgWidth) / img.width;
+
+                    if (imgHeight > signatureMaxHeight) {
+                        imgHeight = signatureMaxHeight;
+                        imgWidth = (img.width * imgHeight) / img.height;
+                    }
+                    
+                    const imgX = centerX - (imgWidth / 2);
+                    const imgY = lineY - imgHeight - 2;
+
+                    doc.addImage(comisionado.signature, 'PNG', imgX, imgY, imgWidth, imgHeight);
+
+                } catch (e) {
+                    console.error(`No se pudo agregar la firma para ${comisionado.nombre}:`, e);
+                }
+            }
+
+            doc.text(`_________________________`, centerX, lineY, { align: 'center' });
+            doc.text(comisionado.nombre || `Firma ${index + 1}`, centerX, lineY + 4, { align: 'center' });
+            doc.setFontSize(7);
+            doc.text(comisionado.cargo || '', centerX, lineY + 7, { align: 'center' });
+            doc.setFontSize(8);
+        });
+
         const mes = getText('mes-reporte') || 'Mes';
         const anio = getText('ano-reporte') || 'Año';
         const iglesia = getText('nombre-iglesia') || 'Iglesia';

@@ -212,6 +212,29 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({
         alert("Información predeterminada guardada.");
     };
 
+    const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 500 * 1024) { // 500 KB limit
+                alert("El archivo es muy grande. El tamaño máximo es 500KB.");
+                return;
+            }
+            if (!['image/png', 'image/jpeg'].includes(file.type)) {
+                alert("Formato de archivo no válido. Por favor, suba un archivo PNG o JPG.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setTempChurchInfo(prev => ({ ...prev, ministerSignature: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleRemoveSignature = () => {
+        setTempChurchInfo(prev => ({ ...prev, ministerSignature: '' }));
+    };
+
     const handleAddComisionado = async () => {
         if (!newComisionado.nombre.trim() || !newComisionado.cargo.trim()) {
             alert('Nombre y cargo son requeridos.');
@@ -238,6 +261,31 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({
                 alert(`Error al eliminar comisionado: ${error instanceof Error ? error.message : String(error)}`);
             }
         }
+    };
+
+    const handleComisionadoSignatureChange = (e: React.ChangeEvent<HTMLInputElement>, comisionadoId: string) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 500 * 1024) {
+                alert("El archivo es muy grande. El tamaño máximo es 500KB.");
+                return;
+            }
+            if (!['image/png', 'image/jpeg'].includes(file.type)) {
+                alert("Formato de archivo no válido. Por favor, suba un archivo PNG o JPG.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const signature = reader.result as string;
+                setComisionados(prev => prev.map(c => c.id === comisionadoId ? { ...c, signature } : c));
+            };
+            reader.readAsDataURL(file);
+        }
+        e.target.value = '';
+    };
+
+    const handleRemoveComisionadoSignature = (comisionadoId: string) => {
+        setComisionados(prev => prev.map(c => c.id === comisionadoId ? { ...c, signature: '' } : c));
     };
 
     const handleExportData = () => {
@@ -367,7 +415,7 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({
                                 </div>
                             ) : (
                                 <>
-                                    <span className={`${!member.isActive && 'line-through text-muted-foreground'}`}>{member.name}</span>
+                                    <span className={!member.isActive ? 'text-muted-foreground' : ''}>{member.name}</span>
                                     <div className="flex items-center gap-2">
                                         <button onClick={() => handleToggleMemberActive(member.id, !member.isActive)} title={member.isActive ? "Marcar como inactivo" : "Marcar como activo"} className={`px-2 py-1 text-xs rounded-full ${member.isActive ? 'bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-red-500/20 text-red-700 dark:text-red-300'}`}>
                                             {member.isActive ? "Activo" : "Inactivo"}
@@ -441,6 +489,22 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({
                         <label className="block text-sm font-medium text-muted-foreground">Teléfono Ministro</label>
                         <input type="text" name="ministerPhone" value={tempChurchInfo.ministerPhone} onChange={handleChurchInfoChange} className="mt-1 w-full p-2 border-input bg-input rounded-md"/>
                     </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-muted-foreground">Firma del Ministro (PNG/JPG, max 500KB)</label>
+                        {tempChurchInfo.ministerSignature ? (
+                            <div className="mt-1 flex items-center gap-4">
+                                <img src={tempChurchInfo.ministerSignature} alt="Firma" className="h-16 w-auto bg-white dark:bg-gray-200 p-1 border rounded-md" />
+                                <button onClick={handleRemoveSignature} className="px-3 py-2 text-xs bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90">Eliminar Firma</button>
+                            </div>
+                        ) : (
+                            <input
+                                type="file"
+                                accept="image/png, image/jpeg"
+                                onChange={handleSignatureChange}
+                                className="mt-1 block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -451,14 +515,32 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({
                     <input type="text" value={newComisionado.cargo} onChange={(e) => setNewComisionado({...newComisionado, cargo: e.target.value})} placeholder="Cargo" className="flex-grow p-2 border-input bg-input rounded-md" />
                     <button onClick={handleAddComisionado} disabled={isSubmitting} className="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:bg-opacity-50">Añadir</button>
                 </div>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                     {comisionados.map(com => (
-                        <li key={com.id} className="flex items-center justify-between p-2 bg-secondary rounded-md">
-                            <div>
-                                <p className="font-semibold text-secondary-foreground">{com.nombre}</p>
-                                <p className="text-sm text-muted-foreground">{com.cargo}</p>
+                        <li key={com.id} className="p-3 bg-secondary rounded-lg border">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-semibold text-secondary-foreground">{com.nombre}</p>
+                                    <p className="text-sm text-muted-foreground">{com.cargo}</p>
+                                </div>
+                                <button onClick={() => handleDeleteComisionado(com.id)} className="p-2 text-destructive hover:text-destructive/80 flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                             </div>
-                            <button onClick={() => handleDeleteComisionado(com.id)} className="p-2 text-destructive hover:text-destructive/80"><Trash2 className="w-4 h-4" /></button>
+                            <div className="mt-3 pt-3 border-t border-border/50">
+                                <label className="block text-xs font-medium text-muted-foreground mb-1">Firma (PNG/JPG, max 500KB)</label>
+                                {com.signature ? (
+                                    <div className="flex items-center gap-4">
+                                        <img src={com.signature} alt={`Firma de ${com.nombre}`} className="h-12 w-auto bg-white dark:bg-gray-200 p-1 border rounded-md" />
+                                        <button onClick={() => handleRemoveComisionadoSignature(com.id)} className="px-3 py-1 text-xs bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90">Eliminar</button>
+                                    </div>
+                                ) : (
+                                    <input
+                                        type="file"
+                                        accept="image/png, image/jpeg"
+                                        onChange={(e) => handleComisionadoSignatureChange(e, com.id)}
+                                        className="block w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                                    />
+                                )}
+                            </div>
                         </li>
                     ))}
                 </ul>

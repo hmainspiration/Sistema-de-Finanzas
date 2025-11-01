@@ -19,6 +19,7 @@ export interface Comisionado {
   id: string;
   nombre: string;
   cargo: string;
+  signature?: string;
 }
 
 export interface Formulas {
@@ -42,6 +43,7 @@ export interface ChurchInfo {
     district: string;
     department: string;
     ministerPhone: string;
+    ministerSignature?: string;
 }
 
 export type MonthlyReportFormState = Record<string, string>;
