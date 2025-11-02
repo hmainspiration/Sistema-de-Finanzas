@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import LoginScreen from './components/LoginScreen';
 import VersionSelectionScreen from './screens/VersionSelectionScreen';
-import MainApp from './screens/MainApp';
 import { useSupabase } from './context/SupabaseContext';
 import { Member, WeeklyRecord, Formulas, MonthlyReport, ChurchInfo, Comisionado } from './types';
 import { INITIAL_MEMBERS, INITIAL_CATEGORIES, DEFAULT_FORMULAS, DEFAULT_CHURCH_INFO } from './constants';
+import MainApp from './screens/MainApp';
+import MainAppSencillo from './screens/MainAppSencillo';
 
 // A custom hook to manage state in localStorage
 function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
@@ -237,15 +238,29 @@ const App: React.FC = () => {
     const appData = { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo, comisionados };
     const appHandlers = { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados, setTheme };
 
-    return <MainApp 
-        onLogout={handleLogout} 
-        onSwitchVersion={handleSwitchVersion}
-        data={appData}
-        handlers={appHandlers}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        appVersion={appVersion}
-    />;
+    if (appVersion === 'sencillo') {
+        return (
+            <MainAppSencillo
+                onLogout={handleLogout}
+                onSwitchVersion={handleSwitchVersion}
+                data={appData}
+                handlers={appHandlers}
+                theme={theme}
+                toggleTheme={toggleTheme}
+            />
+        );
+    }
+
+    return (
+        <MainApp 
+            onLogout={handleLogout} 
+            onSwitchVersion={handleSwitchVersion}
+            data={appData}
+            handlers={appHandlers}
+            theme={theme}
+            toggleTheme={toggleTheme}
+        />
+    );
 };
 
 export default App;

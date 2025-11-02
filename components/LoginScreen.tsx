@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import { APP_VERSION } from '../constants';
+import { APP_VERSION, LOGO_DATA_URL } from '../constants';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -35,6 +35,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <div className="w-full max-w-sm p-8 space-y-6 bg-card text-card-foreground rounded-2xl shadow-2xl border">
         <div className="text-center">
+          <img src={LOGO_DATA_URL} alt="Logo de la Iglesia" className="w-24 h-24 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-foreground">Sistema de Finanzas</h1>
           <p className="text-muted-foreground">La Luz del Mundo</p>
         </div>

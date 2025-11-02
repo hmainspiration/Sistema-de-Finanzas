@@ -44,10 +44,9 @@ interface MainAppProps {
   handlers: AppHandlers;
   theme: string;
   toggleTheme: () => void;
-  appVersion: 'completo' | 'sencillo';
 }
 
-const allNavItems = [
+const navItems = [
   { id: 'register', label: 'Registro', icon: CirclePlus },
   { id: 'summary', label: 'Resumen', icon: BarChart2 },
   { id: 'history', label: 'Semanas', icon: CalendarDays },
@@ -56,7 +55,7 @@ const allNavItems = [
   { id: 'admin', label: 'Admin', icon: Settings },
 ];
 
-const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, handlers, theme, toggleTheme, appVersion }) => {
+const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, handlers, theme, toggleTheme }) => {
   const [activeTab, setActiveTab] = useState<Tab>('register');
   const [isSaving, setIsSaving] = useState(false);
   const { uploadFile, supabase } = useSupabase();
@@ -64,21 +63,6 @@ const MainApp: React.FC<MainAppProps> = ({ onLogout, onSwitchVersion, data, hand
   // Destructure props for easier use
   const { members, categories, weeklyRecords, currentRecord, formulas, monthlyReports, churchInfo, comisionados } = data;
   const { setMembers, setCategories, setWeeklyRecords, setCurrentRecord, setFormulas, setMonthlyReports, setChurchInfo, setComisionados, setTheme } = handlers;
-
-  const navItems = useMemo(() => {
-    if (appVersion === 'sencillo') {
-        const simpleTabs = ['register', 'summary', 'history'];
-        return allNavItems.filter(item => simpleTabs.includes(item.id));
-    }
-    return allNavItems;
-  }, [appVersion]);
-
-  // Reset active tab if it's no longer visible (e.g., after switching from complete to simple version)
-  useEffect(() => {
-      if (!navItems.find(item => item.id === activeTab)) {
-          setActiveTab('register');
-      }
-  }, [navItems, activeTab]);
 
   const uploadRecordToSupabase = async (record: WeeklyRecord) => {
     if (!supabase) {

@@ -2,6 +2,11 @@ import { Member, Formulas, MonthlyReportFormState, ChurchInfo } from './types';
 
 export const APP_VERSION = '1.9.5';
 
+// FIX: Changed to a direct absolute path to the image. This bypasses the module
+// import system that was causing resolution errors and is a more robust solution.
+export const LOGO_DATA_URL = '/icon-192.png';
+
+
 // Lista de miembros actualizada según la solicitud del usuario.
 export const INITIAL_MEMBERS: Member[] = [
   // FIX: Added isActive property to each member object to match the Member type.

@@ -1,5 +1,5 @@
 import { WeeklyRecord, Formulas, MonthlyReport, MonthlyReportFormState, ChurchInfo, Comisionado, Member } from '../../types';
-import { MONTH_NAMES, initialMonthlyReportFormState } from '../../constants';
+import { MONTH_NAMES, initialMonthlyReportFormState, LOGO_DATA_URL } from '../../constants';
 import { Upload, Trash2, Save, FileDown, Eye, X } from 'lucide-react';
 import { useSupabase } from '../../context/SupabaseContext';
 import React, { useState, useMemo, FC, useEffect, useCallback, ReactNode, memo, ChangeEvent } from 'react';
@@ -239,8 +239,6 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
         const { jsPDF } = (window as any).jspdf;
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         
-        const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
-        
         const calculations = calculateReportTotals(formData);
         const getNumericValue = (key: keyof MonthlyReportFormState) => parseFloat(formData[key]) || 0;
 
@@ -250,7 +248,7 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
         const getText = (key: keyof MonthlyReportFormState) => formData[key] || '';
         const getValue = (key: keyof MonthlyReportFormState) => formatCurrency(getNumericValue(key));
         
-        doc.addImage(logoBase64, 'PNG', margin, startY, 25, 25);
+        doc.addImage(LOGO_DATA_URL, 'SVG', margin, startY, 25, 25);
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
@@ -328,9 +326,9 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
             ['Traspaso para Construcción Local', { content: getValue('egr-traspaso-construccion'), styles: rightAlign }],
             ['Muebles y Artículos', { content: getValue('egr-muebles'), styles: rightAlign }],
             ['Viajes y viáticos para Ministro', { content: getValue('egr-viajes-ministro'), styles: rightAlign }],
-            ['Reuniones Ministeriales', { content: getValue('egr-reuniones-ministeriales'), styles: rightAlign }],
+            ['Reuniones Ministeriales', { content: getValue('ing-reuniones-ministeriales'), styles: rightAlign }],
             ['Atención a Ministros', { content: getValue('egr-atencion-ministros'), styles: rightAlign }],
-            ['Viajes fuera del País', { content: getValue('egr-viajes-extranjero'), styles: rightAlign }],
+            ['Viajes fuera del País', { content: getValue('ing-viajes-extranjero'), styles: rightAlign }],
             ['Actividades Locales', { content: getValue('egr-actividades-locales'), styles: rightAlign }],
             ['Ofrendas para Ciudad LLDM', { content: getValue('egr-ciudad-lldm'), styles: rightAlign }],
             ['Adquisición Terreno/Edificio', { content: getValue('egr-adquisicion-terreno'), styles: rightAlign }],
