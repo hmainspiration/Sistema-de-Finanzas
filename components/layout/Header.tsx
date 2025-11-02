@@ -1,7 +1,6 @@
 // Fix: Created a functional header component.
 import React from 'react';
 import { Sun, Moon, RotateCw, LogOut } from 'lucide-react';
-import { LOGO_DATA_URL } from '../../constants';
 
 interface NavItem {
     id: string;
@@ -35,7 +34,6 @@ const Header: React.FC<HeaderProps> = ({
         <header className="bg-card shadow-md sticky top-0 z-20 border-b">
             <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                    <img src={LOGO_DATA_URL} alt="Logo" className="h-8 w-8" />
                     <h1 className="text-xl font-bold text-foreground">Sistema de Finanzas</h1>
                 </div>
                 <div className="flex items-center gap-2">

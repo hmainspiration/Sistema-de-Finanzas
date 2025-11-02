@@ -2,12 +2,6 @@ import { Member, Formulas, MonthlyReportFormState, ChurchInfo } from './types';
 
 export const APP_VERSION = '1.9.5';
 
-// FIX: Se cambió la importación del logo a una ruta pública directa ('/logo.svg')
-// para evitar problemas de resolución de módulos con la configuración de Vite.
-// Esto garantiza que el navegador siempre pueda encontrar el archivo en la raíz del servidor.
-export const LOGO_DATA_URL = '/logo.svg';
-
-
 // Lista de miembros actualizada según la solicitud del usuario.
 export const INITIAL_MEMBERS: Member[] = [
   // FIX: Added isActive property to each member object to match the Member type.

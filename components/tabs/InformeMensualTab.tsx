@@ -1,5 +1,5 @@
 import { WeeklyRecord, Formulas, MonthlyReport, MonthlyReportFormState, ChurchInfo, Comisionado, Member } from '../../types';
-import { MONTH_NAMES, initialMonthlyReportFormState, LOGO_DATA_URL } from '../../constants';
+import { MONTH_NAMES, initialMonthlyReportFormState } from '../../constants';
 import { Upload, Trash2, Save, FileDown, Eye, X } from 'lucide-react';
 import { useSupabase } from '../../context/SupabaseContext';
 import React, { useState, useMemo, FC, useEffect, useCallback, ReactNode, memo, ChangeEvent } from 'react';
@@ -248,8 +248,6 @@ const InformeMensualTab: React.FC<InformeMensualTabProps> = ({ records, formulas
         const getText = (key: keyof MonthlyReportFormState) => formData[key] || '';
         const getValue = (key: keyof MonthlyReportFormState) => formatCurrency(getNumericValue(key));
         
-        doc.addImage(LOGO_DATA_URL, 'SVG', margin, startY, 25, 25);
-
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
         doc.text("IGLESIA DEL DIOS VIVO COLUMNA Y APOYO DE LA VERDAD", pageW / 2, startY + 5, { align: 'center' });
